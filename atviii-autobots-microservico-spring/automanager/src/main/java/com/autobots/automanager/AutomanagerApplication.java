@@ -7,17 +7,17 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.autobots.automanager.entitades.CredencialUsuarioSenha;
-import com.autobots.automanager.entitades.Documento;
-import com.autobots.automanager.entitades.Email;
-import com.autobots.automanager.entitades.Empresa;
-import com.autobots.automanager.entitades.Endereco;
-import com.autobots.automanager.entitades.Mercadoria;
-import com.autobots.automanager.entitades.Servico;
-import com.autobots.automanager.entitades.Telefone;
-import com.autobots.automanager.entitades.Usuario;
-import com.autobots.automanager.entitades.Veiculo;
-import com.autobots.automanager.entitades.Venda;
+import com.autobots.automanager.entidades.CredencialUsuarioSenha;
+import com.autobots.automanager.entidades.Documento;
+import com.autobots.automanager.entidades.Email;
+import com.autobots.automanager.entidades.Empresa;
+import com.autobots.automanager.entidades.Endereco;
+import com.autobots.automanager.entidades.Mercadoria;
+import com.autobots.automanager.entidades.Servico;
+import com.autobots.automanager.entidades.Telefone;
+import com.autobots.automanager.entidades.Usuario;
+import com.autobots.automanager.entidades.Veiculo;
+import com.autobots.automanager.entidades.Venda;
 import com.autobots.automanager.enumeracoes.PerfilUsuario;
 import com.autobots.automanager.enumeracoes.TipoDocumento;
 import com.autobots.automanager.enumeracoes.TipoVeiculo;
@@ -211,6 +211,10 @@ public class AutomanagerApplication implements CommandLineRunner {
 		empresa.getServicos().add(trocaRodas);
 		empresa.getServicos().add(alinhamento);
 
+		// Salvar empresa primeiro para gerar IDs
+		repositorioEmpresa.save(empresa);
+
+		// Agora criar vendas com IDs já existentes
 		Venda venda = new Venda();
 		venda.setCadastro(new Date());
 		venda.setCliente(cliente);
@@ -224,8 +228,6 @@ public class AutomanagerApplication implements CommandLineRunner {
 
 		empresa.getVendas().add(venda);
 
-		repositorioEmpresa.save(empresa);
-		
 		Mercadoria rodaLigaLeve2 = new Mercadoria();
 		rodaLigaLeve2.setCadastro(new Date());
 		rodaLigaLeve2.setFabricao(new Date());
