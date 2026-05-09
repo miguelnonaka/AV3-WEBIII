@@ -38,6 +38,7 @@ public class UsuarioService {
         }
         if (dto.endereco != null) {
             usuario.setEndereco(dto.endereco);
+            dto.endereco.setCliente(usuario);
         }
         if (dto.documentos != null) {
             usuario.setDocumentos(dto.documentos);
@@ -99,6 +100,7 @@ public class UsuarioService {
         }
         if (dto.endereco != null) {
             usuario.setEndereco(dto.endereco);
+            dto.endereco.setCliente(usuario);
         }
         if (dto.documentos != null) {
             usuario.setDocumentos(dto.documentos);

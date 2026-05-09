@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.autobots.automanager.DTO.UsuarioRequestDTO;
 import com.autobots.automanager.DTO.UsuarioResponseDTO;
-import com.autobots.automanager.entidades.Usuario;
 import com.autobots.automanager.servicos.UsuarioService;
 
 @RestController

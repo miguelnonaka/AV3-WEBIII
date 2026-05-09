@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.autobots.automanager.DTO.VeiculoRequestDTO;
 import com.autobots.automanager.DTO.VeiculoResponseDTO;
-import com.autobots.automanager.entidades.Usuario;
 import com.autobots.automanager.entidades.Veiculo;
 import com.autobots.automanager.entidades.Venda;
 import com.autobots.automanager.repositorios.RepositorioUsuario;

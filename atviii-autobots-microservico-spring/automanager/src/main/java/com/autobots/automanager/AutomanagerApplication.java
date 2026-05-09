@@ -22,12 +22,16 @@ import com.autobots.automanager.enumeracoes.PerfilUsuario;
 import com.autobots.automanager.enumeracoes.TipoDocumento;
 import com.autobots.automanager.enumeracoes.TipoVeiculo;
 import com.autobots.automanager.repositorios.RepositorioEmpresa;
+import com.autobots.automanager.repositorios.RepositorioVenda;
 
 @SpringBootApplication
 public class AutomanagerApplication implements CommandLineRunner {
 
 	@Autowired
 	private RepositorioEmpresa repositorioEmpresa;
+
+	@Autowired
+	private RepositorioVenda repositorioVenda;
 
 	public static void main(String[] args) {
 		SpringApplication.run(AutomanagerApplication.class, args);
@@ -61,6 +65,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 		funcionario.setNome("Pedro Alcântara de Bragança e Bourbon");
 		funcionario.setNomeSocial("Dom Pedro");
 		funcionario.getPerfis().add(PerfilUsuario.FUNCIONARIO);
+		funcionario.setEmpresa(empresa);
 
 		Email emailFuncionario = new Email();
 		emailFuncionario.setEndereco("a@a.com");
@@ -74,6 +79,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 		enderecoFuncionario.setRua("Av. São Gabriel");
 		enderecoFuncionario.setNumero("00");
 		enderecoFuncionario.setCodigoPostal("01435-001");
+		enderecoFuncionario.setCliente(funcionario);
 
 		funcionario.setEndereco(enderecoFuncionario);
 
@@ -105,6 +111,7 @@ public class AutomanagerApplication implements CommandLineRunner {
 		fornecedor.setNome("Componentes varejo de partes automotivas ltda");
 		fornecedor.setNomeSocial("Loja do carro, vendas de componentes automotivos");
 		fornecedor.getPerfis().add(PerfilUsuario.FORNECEDOR);
+		fornecedor.setEmpresa(empresa);
 
 		Email emailFornecedor = new Email();
 		emailFornecedor.setEndereco("f@f.com");
@@ -134,11 +141,12 @@ public class AutomanagerApplication implements CommandLineRunner {
 		enderecoFornecedor.setRua("Av. República do chile");
 		enderecoFornecedor.setNumero("00");
 		enderecoFornecedor.setCodigoPostal("20031-170");
+		enderecoFornecedor.setCliente(fornecedor);
 
 		fornecedor.setEndereco(enderecoFornecedor);
 
 		empresa.getUsuarios().add(fornecedor);
-		
+
 		Mercadoria rodaLigaLeve = new Mercadoria();
 		rodaLigaLeve.setCadastro(new Date());
 		rodaLigaLeve.setFabricao(new Date());
@@ -150,12 +158,11 @@ public class AutomanagerApplication implements CommandLineRunner {
 
 		empresa.getMercadorias().add(rodaLigaLeve);
 
-		fornecedor.getMercadorias().add(rodaLigaLeve);
-
 		Usuario cliente = new Usuario();
 		cliente.setNome("Pedro Alcântara de Bragança e Bourbon");
 		cliente.setNomeSocial("Dom pedro cliente");
 		cliente.getPerfis().add(PerfilUsuario.CLIENTE);
+		cliente.setEmpresa(empresa);
 
 		Email emailCliente = new Email();
 		emailCliente.setEndereco("c@c.com");
@@ -185,17 +192,18 @@ public class AutomanagerApplication implements CommandLineRunner {
 		enderecoCliente.setRua("Av. Dr. Nelson D'Ávila");
 		enderecoCliente.setNumero("00");
 		enderecoCliente.setCodigoPostal("12245-070");
+		enderecoCliente.setCliente(cliente);
 
 		cliente.setEndereco(enderecoCliente);
-		
+
 		Veiculo veiculo = new Veiculo();
 		veiculo.setPlaca("ABC-0000");
 		veiculo.setModelo("corolla-cross");
 		veiculo.setTipo(TipoVeiculo.SUV);
 		veiculo.setProprietario(cliente);
-		
+
 		cliente.getVeiculos().add(veiculo);
-		
+
 		empresa.getUsuarios().add(cliente);
 
 		Servico trocaRodas = new Servico();
@@ -211,10 +219,8 @@ public class AutomanagerApplication implements CommandLineRunner {
 		empresa.getServicos().add(trocaRodas);
 		empresa.getServicos().add(alinhamento);
 
-		// Salvar empresa primeiro para gerar IDs
 		repositorioEmpresa.save(empresa);
 
-		// Agora criar vendas com IDs já existentes
 		Venda venda = new Venda();
 		venda.setCadastro(new Date());
 		venda.setCliente(cliente);
@@ -224,9 +230,12 @@ public class AutomanagerApplication implements CommandLineRunner {
 		venda.getServicos().add(trocaRodas);
 		venda.getServicos().add(alinhamento);
 		venda.setVeiculo(veiculo);
+
+		cliente.getVendas().add(venda);
+		funcionario.getVendas().add(venda);
 		veiculo.getVendas().add(venda);
 
-		empresa.getVendas().add(venda);
+		repositorioVenda.save(venda);
 
 		Mercadoria rodaLigaLeve2 = new Mercadoria();
 		rodaLigaLeve2.setCadastro(new Date());
@@ -236,17 +245,23 @@ public class AutomanagerApplication implements CommandLineRunner {
 		rodaLigaLeve2.setQuantidade(30);
 		rodaLigaLeve2.setValor(300.0);
 		rodaLigaLeve2.setDescricao("Roda de liga leve original de fábrica da toyta para modelos do tipo hatch");
-		
+
 		Servico alinhamento2 = new Servico();
 		alinhamento2.setDescricao("Alinhamento das rodas do carro");
 		alinhamento2.setNome("Alinhamento de rodas");
 		alinhamento2.setValor(50);
-		
+
 		Servico balanceamento = new Servico();
 		balanceamento.setDescricao("balanceamento das rodas do carro");
 		balanceamento.setNome("balanceamento de rodas");
 		balanceamento.setValor(30);
-		
+
+		empresa.getMercadorias().add(rodaLigaLeve2);
+		empresa.getServicos().add(balanceamento);
+		empresa.getServicos().add(alinhamento2);
+
+		repositorioEmpresa.save(empresa);
+
 		Venda venda2 = new Venda();
 		venda2.setCadastro(new Date());
 		venda2.setCliente(cliente);
@@ -256,11 +271,11 @@ public class AutomanagerApplication implements CommandLineRunner {
 		venda2.getServicos().add(balanceamento);
 		venda2.getServicos().add(alinhamento2);
 		venda2.setVeiculo(veiculo);
+
+		cliente.getVendas().add(venda2);
+		funcionario.getVendas().add(venda2);
 		veiculo.getVendas().add(venda2);
 
-		empresa.getVendas().add(venda2);
-		
-		repositorioEmpresa.save(empresa);
-
+		repositorioVenda.save(venda2);
 	}
 }

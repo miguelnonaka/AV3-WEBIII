@@ -1,31 +1,51 @@
 package com.autobots.automanager.entidades;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Data
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Endereco {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include
 	private Long id;
+
 	@Column(nullable = false)
 	private String estado;
+
 	@Column(nullable = false)
 	private String cidade;
+
 	@Column(nullable = false)
 	private String bairro;
+
 	@Column(nullable = false)
 	private String rua;
+
 	@Column(nullable = false)
 	private String numero;
+
 	@Column(nullable = false)
 	private String codigoPostal;
-	@Column()
+
+	@Column
 	private String informacoesAdicionais;
+
+	@OneToOne
+	@JoinColumn(name = "cliente_id")
+	@JsonIgnore
+	@ToString.Exclude
+	private Usuario cliente;
 }

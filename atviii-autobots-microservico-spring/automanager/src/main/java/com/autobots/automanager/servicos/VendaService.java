@@ -10,8 +10,6 @@ import com.autobots.automanager.DTO.VendaRequestDTO;
 import com.autobots.automanager.DTO.VendaResponseDTO;
 import com.autobots.automanager.entidades.Mercadoria;
 import com.autobots.automanager.entidades.Servico;
-import com.autobots.automanager.entidades.Usuario;
-import com.autobots.automanager.entidades.Veiculo;
 import com.autobots.automanager.entidades.Venda;
 import com.autobots.automanager.repositorios.RepositorioMercadoria;
 import com.autobots.automanager.repositorios.RepositorioServico;
