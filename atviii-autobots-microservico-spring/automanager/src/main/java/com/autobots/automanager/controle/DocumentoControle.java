@@ -19,11 +19,13 @@ public class DocumentoControle {
 
     @GetMapping("/{id}")
     public ResponseEntity<DocumentoResponseDTO> obterDocumento(@PathVariable Long id) {
-        DocumentoResponseDTO documento = servico.buscarPorId(id);
-        if (documento == null) {
+        DocumentoResponseDTO resposta = servico.buscarPorId(id);
+
+        if (resposta == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(documento);
+
+        return ResponseEntity.ok(resposta);
     }
 
     @GetMapping
@@ -38,17 +40,27 @@ public class DocumentoControle {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DocumentoResponseDTO> atualizarDocumento(@PathVariable Long id, @RequestBody DocumentoRequestDTO dto) {
+    public ResponseEntity<DocumentoResponseDTO> atualizarDocumento(
+            @PathVariable Long id,
+            @RequestBody DocumentoRequestDTO dto) {
+
         DocumentoResponseDTO atualizado = servico.atualizar(id, dto);
+
         if (atualizado == null) {
             return ResponseEntity.notFound().build();
         }
+
         return ResponseEntity.ok(atualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirDocumento(@PathVariable Long id) {
-        servico.deletar(id);
+        boolean removido = servico.deletar(id);
+
+        if (!removido) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.noContent().build();
     }
 }

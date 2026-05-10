@@ -3,19 +3,26 @@ package com.autobots.automanager.servicos;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.autobots.automanager.DTO.CredencialUsuarioSenhaRequestDTO;
 import com.autobots.automanager.DTO.CredencialUsuarioSenhaResponseDTO;
 import com.autobots.automanager.entidades.CredencialUsuarioSenha;
+import com.autobots.automanager.entidades.Usuario;
 import com.autobots.automanager.repositorios.RepositorioCredencialUsuarioSenha;
+import com.autobots.automanager.repositorios.RepositorioUsuario;
 
 @Service
 public class CredencialUsuarioSenhaService {
 
     @Autowired
     private RepositorioCredencialUsuarioSenha repositorio;
+
+    @Autowired
+    private RepositorioUsuario repositorioUsuario;
 
     public CredencialUsuarioSenhaResponseDTO cadastrar(CredencialUsuarioSenhaRequestDTO dto) {
         CredencialUsuarioSenha credencial = new CredencialUsuarioSenha();
@@ -82,8 +89,25 @@ public class CredencialUsuarioSenhaService {
         return response;
     }
 
-    public void deletar(Long id) {
-        repositorio.deleteById(id);
+    @Transactional
+    public boolean deletar(Long id) {
+
+        return repositorio.findById(id).map(credencial -> {
+
+            List<Usuario> usuarios = repositorioUsuario.findAll();
+
+            for (Usuario usuario : usuarios) {
+                usuario.getCredenciais()
+                    .removeIf(c -> c.getId().equals(id));
+            }
+
+            repositorioUsuario.saveAll(usuarios);
+
+            repositorio.delete(credencial);
+
+            return true;
+
+        }).orElse(false);
     }
 
     private CredencialUsuarioSenhaResponseDTO toResponse(CredencialUsuarioSenha credencial) {

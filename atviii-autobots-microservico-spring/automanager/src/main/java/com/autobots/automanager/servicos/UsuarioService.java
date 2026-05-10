@@ -9,9 +9,9 @@ import com.autobots.automanager.DTO.UsuarioRequestDTO;
 import com.autobots.automanager.DTO.UsuarioResponseDTO;
 import com.autobots.automanager.entidades.Empresa;
 import com.autobots.automanager.entidades.Usuario;
-import com.autobots.automanager.repositorios.RepositorioUsuario;
-import com.autobots.automanager.repositorios.RepositorioEmpresa;
 import com.autobots.automanager.modelo.AdicionadorLinkUsuario;
+import com.autobots.automanager.repositorios.RepositorioEmpresa;
+import com.autobots.automanager.repositorios.RepositorioUsuario;
 
 @Service
 public class UsuarioService {
@@ -26,26 +26,32 @@ public class UsuarioService {
     private AdicionadorLinkUsuario adicionador;
 
     public UsuarioResponseDTO cadastrar(UsuarioRequestDTO dto) {
+
         Usuario usuario = new Usuario();
+
         usuario.setNome(dto.nome);
         usuario.setNomeSocial(dto.nomeSocial);
 
         if (dto.perfis != null) {
             usuario.setPerfis(dto.perfis);
         }
+
         if (dto.telefones != null) {
             usuario.setTelefones(dto.telefones);
         }
+
         if (dto.endereco != null) {
             usuario.setEndereco(dto.endereco);
-            dto.endereco.setCliente(usuario);
         }
+
         if (dto.documentos != null) {
             usuario.setDocumentos(dto.documentos);
         }
+
         if (dto.emails != null) {
             usuario.setEmails(dto.emails);
         }
+
         if (dto.credenciais != null) {
             usuario.setCredenciais(dto.credenciais);
         }
@@ -53,17 +59,21 @@ public class UsuarioService {
         usuario = repositorio.save(usuario);
 
         UsuarioResponseDTO response = toResponse(usuario);
+
         adicionador.adicionarLink(response);
+
         return response;
     }
 
     public List<UsuarioResponseDTO> listar() {
+
         List<UsuarioResponseDTO> lista = repositorio.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
 
         adicionador.adicionarLink(lista);
+
         return lista;
     }
 
@@ -72,62 +82,82 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO buscarPorId(Long id) {
+
         Usuario usuario = repositorio.findById(id).orElse(null);
+
         if (usuario == null) {
             return null;
         }
 
         UsuarioResponseDTO response = toResponse(usuario);
+
         adicionador.adicionarLink(response);
+
         return response;
     }
 
     public UsuarioResponseDTO atualizar(Long id, UsuarioRequestDTO dto) {
+
         Usuario usuario = repositorio.findById(id).orElse(null);
-        if (usuario == null) return null;
+
+        if (usuario == null) {
+            return null;
+        }
 
         if (dto.nome != null) {
             usuario.setNome(dto.nome);
         }
+
         if (dto.nomeSocial != null) {
             usuario.setNomeSocial(dto.nomeSocial);
         }
+
         if (dto.perfis != null) {
             usuario.setPerfis(dto.perfis);
         }
+
         if (dto.telefones != null) {
             usuario.setTelefones(dto.telefones);
         }
+
         if (dto.endereco != null) {
             usuario.setEndereco(dto.endereco);
-            dto.endereco.setCliente(usuario);
         }
+
         if (dto.documentos != null) {
             usuario.setDocumentos(dto.documentos);
         }
+
         if (dto.emails != null) {
             usuario.setEmails(dto.emails);
         }
+
         if (dto.credenciais != null) {
             usuario.setCredenciais(dto.credenciais);
-        }
-        if (dto.empresaId != null) {
-            Empresa empresa = repositorioEmpresa.findById(dto.empresaId).orElse(null);
-            usuario.setEmpresa(empresa);
         }
 
         usuario = repositorio.save(usuario);
 
         UsuarioResponseDTO response = toResponse(usuario);
+
         adicionador.adicionarLink(response);
+
         return response;
     }
 
-    public void deletar(Long id) {
-        repositorio.deleteById(id);
-    }
+	public boolean deletar(Long id) {
+		if (!repositorio.existsById(id)) return false;
+		List<Empresa> empresas = repositorioEmpresa.findAll();
+		for (Empresa empresa : empresas) {
+			empresa.getUsuarios().removeIf(u -> u.getId().equals(id));
+			repositorioEmpresa.save(empresa);
+		}
+		repositorio.deleteById(id);
+		return true;
+	}
 
     private UsuarioResponseDTO toResponse(Usuario usuario) {
+
         UsuarioResponseDTO dto = new UsuarioResponseDTO();
 
         dto.id = usuario.getId();
@@ -139,9 +169,6 @@ public class UsuarioService {
         dto.documentos = usuario.getDocumentos();
         dto.emails = usuario.getEmails();
         dto.credenciais = usuario.getCredenciais();
-        if (usuario.getEmpresa() != null) {
-            dto.empresaId = usuario.getEmpresa().getId();
-        }
 
         return dto;
     }

@@ -5,18 +5,24 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.autobots.automanager.DTO.DocumentoRequestDTO;
 import com.autobots.automanager.DTO.DocumentoResponseDTO;
 import com.autobots.automanager.entidades.Documento;
+import com.autobots.automanager.entidades.Usuario;
 import com.autobots.automanager.modelo.AdicionadorLinkGenerico;
 import com.autobots.automanager.repositorios.DocumentoRepositorio;
+import com.autobots.automanager.repositorios.RepositorioUsuario;
 
 @Service
 public class DocumentoService {
 
     @Autowired
     private DocumentoRepositorio repositorio;
+
+    @Autowired
+    private RepositorioUsuario repositorioUsuario;
 
     @Autowired
     private AdicionadorLinkGenerico adicionador;
@@ -35,7 +41,11 @@ public class DocumentoService {
     }
 
     public List<DocumentoResponseDTO> listar() {
-        List<DocumentoResponseDTO> lista = repositorio.findAll().stream().map(this::toResponse).collect(Collectors.toList());
+        List<DocumentoResponseDTO> lista = repositorio.findAll()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+
         lista.forEach(documento -> adicionador.adicionarLink(documento, "documentos", documento.id));
         return lista;
     }
@@ -55,6 +65,7 @@ public class DocumentoService {
         if (documento == null) {
             return null;
         }
+
         if (dto.tipo != null) {
             documento.setTipo(dto.tipo);
         }
@@ -66,13 +77,27 @@ public class DocumentoService {
         }
 
         documento = repositorio.save(documento);
+
         DocumentoResponseDTO response = toResponse(documento);
         adicionador.adicionarLink(response, "documentos", response.id);
         return response;
     }
 
-    public void deletar(Long id) {
+    @Transactional
+    public boolean deletar(Long id) {
+        if (!repositorio.existsById(id)) {
+            return false;
+        }
+
+        List<Usuario> usuarios = repositorioUsuario.findAll();
+
+        for (Usuario usuario : usuarios) {
+            usuario.getDocumentos().removeIf(d -> d.getId().equals(id));
+        }
+
+        repositorioUsuario.saveAll(usuarios);
         repositorio.deleteById(id);
+        return true;
     }
 
     private DocumentoResponseDTO toResponse(Documento documento) {
