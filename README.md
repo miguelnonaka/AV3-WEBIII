@@ -1,39 +1,32 @@
-# AV3 - AutoManager API
+# AV2
+---
 
-API REST desenvolvida com Spring Boot para gerenciamento de empresas, usuários, vendas, serviços, veículos e entidades relacionadas.
+## Como executar o projeto
+
+### 1. Clone o repositório
 
 ---
 
-# Como executar o projeto
+### 2. Configuração do banco
 
-## 1. Clone o repositório
-
----
-
-## 2.1 Configuração do banco de dados
-
-### application.properties
+#### 2.1 Configure o `application.properties`
 
 ```properties
-spring.application.name=AutoBots
-
-# URL de conexão com o banco MySQL
 spring.datasource.url=jdbc:mysql://localhost:3306/generaldb?createDatabaseIfNotExist=true
 spring.datasource.username=root
-spring.datasource.password=Tomilho@0123
+spring.datasource.password=SUA_SENHA
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-#comandos
-spring.jpa.hibernate.ddl-auto=create
-spring.jpa.show-sql: true
-spring.jpa.properties.hibernate.format_sql=true
 
-#logging.level.org.hibernate.SQL=debug
-#logging.level.org.hibernate.type.descriptor.sql=trace
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 ```
+
 #### 2.2 Importante
 
 - Certifique-se de que o MySQL está rodando
 - O banco `generaldb` será criado automaticamente
+
 ---
 
 ### 3. Execução do projeto
@@ -56,210 +49,106 @@ Ferramentas: Insomnia ou Postman
 
 ---
 
+# CLIENTES
 
-# EMPRESAS
-
-Base:
-
-```text
-http://localhost:8080/empresas
-```
+Base: `/clientes`
 
 ## GET
 
-### Listar empresas
-
+### Listar todos
 ```text
-GET http://localhost:8080/empresas
+GET localhost:8080/clientes
 ```
 
-### Buscar empresa por ID
-
+### Buscar por ID
 ```text
-GET http://localhost:8080/empresas/{id}
+GET localhost:8080/clientes/{id}
 ```
 
 ---
 
 ## POST
 
-### Criar empresa
-
+### Criar cliente
 ```text
-POST http://localhost:8080/empresas
+POST localhost:8080/clientes
 ```
 
+### Body (JSON completo permitido pelo DTO atual)
 ```json
 {
-  "razaoSocial": "AutoBots Manutenção Ltda",
-  "nomeFantasia": "AutoBots",
-  "cadastro": "2024-01-15T10:00:00.000Z",
-  "telefones": [
-    {
-      "ddd": "11",
-      "numero": "99999-8888"
-    }
-  ],
-  "endereco": {
-    "estado": "SP",
-    "cidade": "São Paulo",
-    "bairro": "Centro",
-    "rua": "Rua das Flores",
-    "numero": "123",
-    "codigoPostal": "01234-567",
-    "informacoesAdicionais": "Próximo ao metrô"
+  "nome": "Pedro Alcântara de Bragança e Bourbon",
+  "nomeSocial": "Dom Pedro II",
+  "dataNascimento": "2002-06-15T00:00:00.000+00:00"
+}
+```
+
+---
+
+## PUT
+
+### Atualizar cliente
+```text
+PUT localhost:8080/clientes/{id}
+```
+
+### Body (JSON completo)
+```json
+{
+  "nome": "Pedro Atualizado",
+  "nomeSocial": "Dom Pedro Atualizado",
+  "dataNascimento": "2000-01-01T00:00:00.000+00:00"
+}
+```
+
+### Respostas esperadas
+- `200 OK` quando atualizado
+- `404 Not Found` quando não existir
+
+---
+
+## DELETE
+
+### Excluir cliente
+```text
+DELETE localhost:8080/clientes/{id}
+```
+
+---
+
+# DOCUMENTO
+
+Base: `/documento`
+
+## GET
+
+### Listar todos
+```text
+GET localhost:8080/documento
+```
+
+### Buscar por ID
+```text
+GET localhost:8080/documento/{id}
+```
+
+---
+
+## POST
+
+### Criar documento com cliente associado
+```text
+POST localhost:8080/documento
+```
+
+### Body (JSON completo)
+```json
+{
+  "tipo": "CPF",
+  "numero": "12345678900",
+  "cliente": {
+    "id": 1
   }
-}
-```
-
----
-
-## PUT
-
-### Atualizar empresa
-
-```text
-PUT http://localhost:8080/empresas/{id}
-```
-
----
-
-## DELETE
-
-### Deletar empresa
-
-```text
-DELETE http://localhost:8080/empresas/{id}
-```
-
----
-
-# USUÁRIOS
-
-Base:
-
-```text
-http://localhost:8080/usuarios
-```
-
-## GET
-
-### Listar usuários
-
-```text
-GET http://localhost:8080/usuarios
-```
-
-### Buscar usuário por ID
-
-```text
-GET http://localhost:8080/usuarios/{id}
-```
-
----
-
-## POST
-
-### Criar usuário
-
-```text
-POST http://localhost:8080/usuarios
-```
-
-```json
-{
-  "nome": "João Silva",
-  "nomeSocial": "João",
-  "perfis": ["CLIENTE"],
-  "empresaId": 1,
-  "telefones": [
-    {
-      "ddd": "11",
-      "numero": "88888-7777"
-    }
-  ],
-  "endereco": {
-    "estado": "SP",
-    "cidade": "São Paulo",
-    "bairro": "Vila Mariana",
-    "rua": "Rua dos Pinheiros",
-    "numero": "456",
-    "codigoPostal": "04123-456"
-  },
-  "documentos": [
-    {
-      "tipoDocumento": "CPF",
-      "numero": "123.456.789-00",
-      "dataEmissao": "2026-05-09"
-    }
-  ],
-  "emails": [
-    {
-      "endereco": "joao@email.com"
-    }
-  ]
-}
-```
-
----
-
-## PUT
-
-### Atualizar usuário
-
-```text
-PUT http://localhost:8080/usuarios/{id}
-```
-
----
-
-## DELETE
-
-### Deletar usuário
-
-```text
-DELETE http://localhost:8080/usuarios/{id}
-```
-
----
-
-# DOCUMENTOS
-
-Base:
-
-```text
-http://localhost:8080/documentos
-```
-
-## GET
-
-### Listar documentos
-
-```text
-GET http://localhost:8080/documentos
-```
-
-### Buscar documento por ID
-
-```text
-GET http://localhost:8080/documentos/{id}
-```
-
----
-
-## POST
-
-### Criar documento
-
-```text
-POST http://localhost:8080/documentos
-```
-
-```json
-{
-  "tipoDocumento": "CPF",
-  "dataEmissao": "2026-05-09",
-  "numero": "123.456.789-00"
 }
 ```
 
@@ -268,544 +157,69 @@ POST http://localhost:8080/documentos
 ## PUT
 
 ### Atualizar documento
-
 ```text
-PUT http://localhost:8080/documentos/{id}
+PUT localhost:8080/documento
+```
+
+### Body (JSON completo)
+```json
+{
+  "id": 1,
+  "tipo": "CPF",
+  "numero": "99999999999",
+  "cliente": {
+    "id": 1
+  }
+}
 ```
 
 ---
 
 ## DELETE
 
-### Deletar documento
-
+### Excluir documento
 ```text
-DELETE http://localhost:8080/documentos/{id}
+DELETE localhost:8080/documento/{id}
 ```
 
 ---
 
 # ENDEREÇOS
 
-Base:
-
-```text
-http://localhost:8080/enderecos
-```
+Base: `/enderecos`
 
 ## GET
 
-### Listar endereços
-
+### Listar todos
 ```text
-GET http://localhost:8080/enderecos
+GET localhost:8080/enderecos
 ```
 
-### Buscar endereço por ID
-
+### Buscar por ID
 ```text
-GET http://localhost:8080/enderecos/{id}
+GET localhost:8080/enderecos/{id}
 ```
 
 ---
 
 ## POST
 
-### Criar endereço
-
+### Criar endereço com cliente associado
 ```text
-POST http://localhost:8080/enderecos
+POST localhost:8080/enderecos
 ```
 
+### Body (JSON completo)
 ```json
 {
   "estado": "SP",
-  "cidade": "São Paulo",
+  "cidade": "São José dos Campos",
   "bairro": "Centro",
-  "rua": "Av. Paulista",
-  "numero": "1000",
-  "codigoPostal": "01310-100",
-  "informacoesAdicionais": "Próximo ao MASP"
-}
-```
-
----
-
-## PUT
-
-### Atualizar endereço
-
-```text
-PUT http://localhost:8080/enderecos/{id}
-```
-
----
-
-## DELETE
-
-### Deletar endereço
-
-```text
-DELETE http://localhost:8080/enderecos/{id}
-```
-
----
-
-# TELEFONES
-
-Base:
-
-```text
-http://localhost:8080/telefones
-```
-
-## GET
-
-### Listar telefones
-
-```text
-GET http://localhost:8080/telefones
-```
-
-### Buscar telefone por ID
-
-```text
-GET http://localhost:8080/telefones/{id}
-```
-
----
-
-## POST
-
-### Criar telefone
-
-```text
-POST http://localhost:8080/telefones
-```
-
-```json
-{
-  "ddd": "11",
-  "numero": "99999-9999"
-}
-```
-
----
-
-## PUT
-
-### Atualizar telefone
-
-```text
-PUT http://localhost:8080/telefones/{id}
-```
-
----
-
-## DELETE
-
-### Deletar telefone
-
-```text
-DELETE http://localhost:8080/telefones/{id}
-```
-
----
-
-# EMAILS
-
-Base:
-
-```text
-http://localhost:8080/emails
-```
-
-## GET
-
-### Listar emails
-
-```text
-GET http://localhost:8080/emails
-```
-
-### Buscar email por ID
-
-```text
-GET http://localhost:8080/emails/{id}
-```
-
----
-
-## POST
-
-### Criar email
-
-```text
-POST http://localhost:8080/emails
-```
-
-```json
-{
-  "endereco": "contato@autobots.com"
-}
-```
-
----
-
-## PUT
-
-### Atualizar email
-
-```text
-PUT http://localhost:8080/emails/{id}
-```
-
----
-
-## DELETE
-
-### Deletar email
-
-```text
-DELETE http://localhost:8080/emails/{id}
-```
-
----
-
-# CREDENCIAIS SENHA
-
-Base:
-
-```text
-http://localhost:8080/credenciais-senha
-```
-
-## GET
-
-### Listar credenciais
-
-```text
-GET http://localhost:8080/credenciais-senha
-```
-
-### Buscar credencial por ID
-
-```text
-GET http://localhost:8080/credenciais-senha/{id}
-```
-
----
-
-## POST
-
-### Criar credencial
-
-```text
-POST http://localhost:8080/credenciais-senha
-```
-
-```json
-{
-  "nomeUsuario": "joao.silva",
-  "senha": "senha123",
-  "criacao": "2024-01-15T10:00:00.000Z",
-  "ultimoAcesso": "2024-01-15T10:00:00.000Z",
-  "inativo": false
-}
-```
-
----
-
-## PUT
-
-### Atualizar credencial
-
-```text
-PUT http://localhost:8080/credenciais-senha/{id}
-```
-
----
-
-## DELETE
-
-### Deletar credencial
-
-```text
-DELETE http://localhost:8080/credenciais-senha/{id}
-```
-
----
-
-# CREDENCIAIS CÓDIGO BARRA
-
-Base:
-
-```text
-http://localhost:8080/credenciais-codigo-barra
-```
-
-## GET
-
-### Listar credenciais
-
-```text
-GET http://localhost:8080/credenciais-codigo-barra
-```
-
-### Buscar credencial por ID
-
-```text
-GET http://localhost:8080/credenciais-codigo-barra/{id}
-```
-
----
-
-## POST
-
-### Criar credencial
-
-```text
-POST http://localhost:8080/credenciais-codigo-barra
-```
-
-```json
-{
-  "codigo": 1234567890123,
-  "criacao": "2024-01-15T10:00:00.000Z",
-  "ultimoAcesso": "2024-01-15T10:00:00.000Z",
-  "inativo": false
-}
-```
-
----
-
-## PUT
-
-### Atualizar credencial
-
-```text
-PUT http://localhost:8080/credenciais-codigo-barra/{id}
-```
-
----
-
-## DELETE
-
-### Deletar credencial
-
-```text
-DELETE http://localhost:8080/credenciais-codigo-barra/{id}
-```
-
----
-
-# VEÍCULOS
-
-Base:
-
-```text
-http://localhost:8080/veiculos
-```
-
-## GET
-
-```text
-GET http://localhost:8080/veiculos
-```
-
-```text
-GET http://localhost:8080/veiculos/{id}
-```
-
----
-
-## POST
-
-```text
-POST http://localhost:8080/veiculos
-```
-
-```json
-{
-  "tipo": "CARRO",
-  "modelo": "Toyota Corolla",
-  "placa": "ABC-1234"
-}
-```
-
----
-
-## PUT
-
-```text
-PUT http://localhost:8080/veiculos/{id}
-```
-
----
-
-## DELETE
-
-```text
-DELETE http://localhost:8080/veiculos/{id}
-```
-
----
-
-# MERCADORIAS
-
-Base:
-
-```text
-http://localhost:8080/mercadorias
-```
-
-## GET
-
-```text
-GET http://localhost:8080/mercadorias
-```
-
-```text
-GET http://localhost:8080/mercadorias/{id}
-```
-
----
-
-## POST
-
-```text
-POST http://localhost:8080/mercadorias
-```
-
-```json
-{
-  "nome": "Óleo de Motor 5W30",
-  "descricao": "Óleo sintético para motores",
-  "quantidade": 50,
-  "valor": 45.90,
-  "validade": "2025-12-31T23:59:59.000Z",
-  "fabricao": "2024-01-01T00:00:00.000Z",
-  "cadastro": "2024-01-15T10:00:00.000Z"
-}
-```
-
----
-
-## PUT
-
-```text
-PUT http://localhost:8080/mercadorias/{id}
-```
-
----
-
-## DELETE
-
-```text
-DELETE http://localhost:8080/mercadorias/{id}
-```
-
----
-
-# SERVIÇOS
-
-Base:
-
-```text
-http://localhost:8080/servicos
-```
-
-## GET
-
-```text
-GET http://localhost:8080/servicos
-```
-
-```text
-GET http://localhost:8080/servicos/{id}
-```
-
----
-
-## POST
-
-```text
-POST http://localhost:8080/servicos
-```
-
-```json
-{
-  "nome": "Troca de Óleo",
-  "valor": 120.00,
-  "descricao": "Troca completa de óleo do motor com filtro"
-}
-```
-
----
-
-## PUT
-
-```text
-PUT http://localhost:8080/servicos/{id}
-```
-
----
-
-## DELETE
-
-```text
-DELETE http://localhost:8080/servicos/{id}
-```
-
----
-
-# VENDAS
-
-Base:
-
-```text
-http://localhost:8080/vendas
-```
-
-## GET
-
-```text
-GET http://localhost:8080/vendas
-```
-
-```text
-GET http://localhost:8080/vendas/{id}
-```
-
----
-
-## POST
-
-```text
-POST http://localhost:8080/vendas
-```
-
-```json
-{
-  "cadastro": "2024-01-15T14:30:00.000Z",
-  "identificacao": "VND-2024-001",
+  "rua": "Rua A",
+  "numero": "100",
+  "codigoPostal": "12200000",
+  "informacoesAdicionais": "Casa",
   "cliente": {
-    "id": 1
-  },
-  "funcionario": {
-    "id": 2
-  },
-  "mercadorias": [
-    {
-      "id": 1
-    }
-  ],
-  "servicos": [
-    {
-      "id": 1
-    }
-  ],
-  "veiculo": {
     "id": 1
   }
 }
@@ -815,14 +229,104 @@ POST http://localhost:8080/vendas
 
 ## PUT
 
+### Atualizar endereço
 ```text
-PUT http://localhost:8080/vendas/{id}
+PUT localhost:8080/enderecos
+```
+
+### Body (JSON completo)
+```json
+{
+  "id": 1,
+  "estado": "RJ",
+  "cidade": "Rio de Janeiro",
+  "bairro": "Copacabana",
+  "rua": "Avenida Atlântica",
+  "numero": "1702",
+  "codigoPostal": "22021001",
+  "informacoesAdicionais": "Hotel Copacabana Palace",
+  "cliente": {
+    "id": 1
+  }
+}
 ```
 
 ---
 
 ## DELETE
 
+### Excluir endereço
 ```text
-DELETE http://localhost:8080/vendas/{id}
+DELETE localhost:8080/enderecos/{id}
 ```
+
+---
+
+# TELEFONES
+
+Base: `/telefones`
+
+## GET
+
+### Listar todos
+```text
+GET localhost:8080/telefones
+```
+
+### Buscar por ID
+```text
+GET localhost:8080/telefones/{id}
+```
+
+---
+
+## POST
+
+### Criar telefone com cliente associado
+```text
+POST localhost:8080/telefones
+```
+
+### Body (JSON completo)
+```json
+{
+  "ddd": "12",
+  "numero": "999999999",
+  "cliente": {
+    "id": 1
+  }
+}
+```
+
+---
+
+## PUT
+
+### Atualizar telefone
+```text
+PUT localhost:8080/telefones
+```
+
+### Body (JSON completo)
+```json
+{
+  "id": 1,
+  "ddd": "11",
+  "numero": "988888888",
+  "cliente": {
+    "id": 1
+  }
+}
+```
+
+---
+
+## DELETE
+
+### Excluir telefone
+```text
+DELETE localhost:8080/telefones/{id}
+```
+
+---
+
